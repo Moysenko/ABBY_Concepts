@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-STACK_SIZE = 3
+STACK_SIZE = 5
 
 
 class SectionType:
@@ -59,8 +59,12 @@ _command_meta = {
         'code': 0x21,
         'args': (ArgumentType.REG,),
     },
+    'READ_INT': {
+        'code': 0x22,
+        'args': (ArgumentType.REG,),
+    },
     'PRINT_HELLOWORLD': {
-        'code': 0x22
+        'code': 0x23
     },
 
     'CALL': {
@@ -70,12 +74,20 @@ _command_meta = {
     'RET': {
         'code': 0x31,
     },
-    'EXIT': {
+    'RET_ZERO': {
         'code': 0x32,
+        'args': (ArgumentType.REG,),
+    },
+    'EXIT': {
+        'code': 0x33,
     },
     'JMP': {
-        'code': 0x33,
+        'code': 0x34,
         'args': (ArgumentType.FUNC,),
+    },
+    'JMP_ZERO': {
+        'code': 0x35,
+        'args': (ArgumentType.FUNC, ArgumentType.REG,),
     },
 
     'PUSH': {
@@ -107,7 +119,11 @@ class Encoder:
 
         current_section = SectionType.VARIABLES
         for line in self._code:
-            formatted_line = line.strip()
+            formatted_line = line
+            if '#' in line:
+                formatted_line, _ = formatted_line.split('#', 1)
+            formatted_line = formatted_line.strip()
+
             if formatted_line == "":
                 continue
 
@@ -195,7 +211,6 @@ class Encoder:
         if _type == ArgumentType.CONST:
             return int(value)
         elif _type == ArgumentType.FUNC:
-            print(value, _type)
             return int(self._func_pos[value])
         elif value in self._var_pos:
             return int(self._var_pos[value])
