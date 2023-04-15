@@ -3,9 +3,6 @@
 from binary import Binary
 from encoder import Encoder
 from processor import Processor
-import coloredlogs
-
-coloredlogs.install()
 
 
 def run():

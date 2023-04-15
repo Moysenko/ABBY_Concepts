@@ -15,12 +15,15 @@ class Binary:
         self._data[block_start: block_start + BLOCK_SIZE] = value
 
     def get_int(self, pos: int):
-        return int.from_bytes(self.get_bytes(pos), byteorder='big')
+        return int.from_bytes(self.get_bytes(pos), byteorder='big', signed=True)
+    
+    def set_int(self, pos: int, value: int):
+        self.set_bytes(pos, value.to_bytes(4, byteorder='big', signed=True))
 
     def get_parsed_command(self, pos: int):
         command = self.get_bytes(pos)
-        to_int = lambda x: int.from_bytes(x, byteorder='big')
-        return list(map(to_int, [command[:1], command[1: 2], command[2: 4]]))
+        to_int = lambda x: int.from_bytes(x, byteorder='big', signed=True)
+        return list(map(to_int, [command[:1], command[1: 3], command[3: 4]]))
 
     @property
     def size(self):
